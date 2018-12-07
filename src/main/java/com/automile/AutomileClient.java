@@ -10,7 +10,6 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -81,11 +80,10 @@ public class AutomileClient {
             AuthResponse authResponse = getMapper().readValue(responseString, AuthResponse.class);
             authResponse.setExpirationDate(LocalDateTime.now().plusSeconds(authResponse.getExpiresIn()));
             automileService.setAuthResponse(authResponse);
+            response.close();
         } catch (IOException e) {
             log.error(e.getMessage(), e);
             throw new AutomileException(e);
-        } finally {
-            IOUtils.closeQuietly(response);
         }
     }
 

@@ -8,7 +8,6 @@ import com.google.common.net.HttpHeaders;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -32,7 +31,7 @@ import java.util.List;
 import static com.automile.AutomileConfig.getHttpClient;
 import static com.automile.AutomileConfig.getMapper;
 import static java.lang.String.format;
-import static org.apache.commons.lang3.CharEncoding.UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Slf4j
 public class AutomileService {
@@ -49,11 +48,10 @@ public class AutomileService {
         try {
             response = getHttpClient().execute(request);
             getResponseString(response);
+            response.close();
         } catch (IOException e) {
             log.error(e.getMessage(), e);
             throw new AutomileException(e);
-        } finally {
-            IOUtils.closeQuietly(response);
         }
     }
 
@@ -75,12 +73,11 @@ public class AutomileService {
             String responseString = getResponseString(response);
             JavaType collectionType = getMapper().getTypeFactory().constructCollectionType(List.class, clazz);
             ObjectReader objectReader = getMapper().readerFor(collectionType);
+            response.close();
             return objectReader.readValue(responseString);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
             throw new AutomileException(e);
-        } finally {
-            IOUtils.closeQuietly(response);
         }
     }
 
@@ -129,9 +126,11 @@ public class AutomileService {
             if (statusCode == HttpStatus.SC_CREATED) {
                 log.info("Response status code {}", statusCode);
                 Header location = response.getFirstHeader(org.apache.http.HttpHeaders.LOCATION);
+                response.close();
                 return getCall(clazz, location.getValue());
             }
             String responseString = getResponseString(response);
+            response.close();
             if (StringUtils.isEmpty(responseString) || clazz == null) {
                 return null;
             }
@@ -139,8 +138,6 @@ public class AutomileService {
         } catch (IOException e) {
             log.error(e.getMessage(), e);
             throw new AutomileException(e);
-        } finally {
-            IOUtils.closeQuietly(response);
         }
     }
 
