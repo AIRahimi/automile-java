@@ -4,12 +4,15 @@ buildscript {
     }
 }
 
-apply plugin: 'java'
-apply plugin: 'maven'
+plugins {
+    id 'java'
+    id 'maven'
+}
 
 jar {
     baseName = 'client'
 }
+
 group = 'com.automile'
 version = '1.0.2'
 
@@ -21,18 +24,17 @@ repositories {
 }
 
 dependencies {
-    def jacksonCoreVersion = '2.8.6'
 
-    compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonCoreVersion}")
-    compile('org.apache.httpcomponents:httpclient:4.5.2')
-    compile('org.apache.commons:commons-lang3:3.5')
-    compile('org.apache.commons:commons-collections4:4.1')
-    compile('com.google.guava:guava:21.0')
-    compile('ch.qos.logback:logback-classic:1.1.9')
-    compile('commons-io:commons-io:2.5')
+    compile 'org.projectlombok:lombok:1.18.4'
+    annotationProcessor 'org.projectlombok:lombok:1.18.4'
+    compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.7'
+    compile 'org.apache.httpcomponents:httpclient:4.5.6'
+    compile 'org.apache.commons:commons-lang3:3.8.1'
+    compile 'org.apache.commons:commons-collections4:4.2'
+    compile 'com.google.guava:guava:27.0.1-jre'
+    compile 'ch.qos.logback:logback-classic:1.2.3'
+    compile 'commons-io:commons-io:2.6'
 
-    compileOnly('org.projectlombok:lombok:1.16.12')
-
-    testCompile('junit:junit:4.12')
-    testCompile('org.mockito:mockito-all:1.10.19')
-}
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-core:2.23.4'
+}	
